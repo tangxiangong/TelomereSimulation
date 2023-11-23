@@ -1,5 +1,3 @@
-include("randoms.jl")
-
 function _randomwalk(T, x₀, wait, jump, wait_args, jump_args)
     t = Vector{Float64}()
     x = Vector{Float64}()

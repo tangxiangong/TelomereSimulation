@@ -1,4 +1,8 @@
+name = "Telomere"
+uuid = "0a4541f2-89f8-11ee-0921-7d95268e79fa"
+author = ["小雨 <tangxiangong@gmail.com>"]
 [deps]
 PGFPlotsX = "8314cec4-20b6-5062-9cdb-752b83310925"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PoissonRandom = "e409e4f3-bfea-5376-8464-e040bb5c01ab"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"

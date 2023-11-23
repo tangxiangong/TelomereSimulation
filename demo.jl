@@ -1,4 +1,4 @@
-include("abstract.jl")
+using Telomere
 using Plots
 pgfplotsx()
 

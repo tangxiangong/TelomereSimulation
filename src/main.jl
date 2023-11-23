@@ -1,7 +1,8 @@
 import Base:show, ^
 using .Threads 
-
+include("randoms.jl")
 include("randomwalks.jl")
+include("subordinators.jl")
 include("langevin.jl")
 include("functionals.jl")
 
@@ -153,4 +154,3 @@ end
 𝔼(ptraj::PowerTrajectory; N::Int=100_000, τ=0.01) = moments(ptraj.traj, N; τ=τ, order=ptraj.order)
 𝔼(f::FPT; τ=1e-2, N::Int=100_000) = moments(f, N; τ=τ)
 𝔼(pf::PowerFPT; τ=1e-2, N::Int=100_000) = moments(pf.fpt, N; τ=τ, order=pf.order)
-

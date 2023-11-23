@@ -1,6 +1,3 @@
-include("randoms.jl")
-
-
 function subordinator(T, α, τ=0.01)
     t = collect(0:τ:T)
     x = similar(t)
@@ -24,7 +21,6 @@ function inv_subordinator(T, α, τ)
     @inbounds @simd for n in eachindex(t)
         index = findfirst(s->s>=t[n], s_sub)
         x[n] = t_sub[index]
-    end
-    
+    end   
     t, x
 end
