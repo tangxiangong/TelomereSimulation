@@ -1,4 +1,4 @@
-using Telomere
+include("./src/main.jl")
 using Plots
 pgfplotsx()
 
@@ -11,19 +11,21 @@ begin
     λ = 1
     μ = 0
     σ = 1
-    t = 100
-    domain = (-1, 1)
+    T = 100
+    domain = (-10, 10)
 end
 #= 1. 随机游走 =#
 
 rw = TelomereRW((l₀, α, λ, μ, σ)) 
 # 相对应的路径
-rwₜ = rw(t)
+rwₜ = rw(T)
 # 模拟路径
 simulate(rwₜ, 0.1)
 # 阶矩
 𝔼(rwₜ,τ=0.1), 𝔼(rwₜ^2)
 # 随机变量：首次通过时间
+ot = OccupationTime(T, domain, rw)
+simulate(ot)
 fpt = FPT(domain, rw)
 # 模拟
 simulate(fpt)
@@ -34,7 +36,7 @@ simulate(fpt)
 
 langevin = TelomereLangevin((l₀, α, λ, μ, σ)) 
 # 相对应的路径
-langevinₜ = langevin(t)
+langevinₜ = langevin(T)
 # 模拟路径
 simulate(langevinₜ, 0.1)
 # 阶矩
@@ -49,7 +51,7 @@ simulate(fptl)
 #= 3. 时间回火随机游走 =#
 ttrw = TelomereTTRW((l₀, α, γ, λ, μ, σ)) 
 # 相对应的路径
-ttrwₜ = ttrw(t)
+ttrwₜ = ttrw(T)
 # 模拟路径
 simulate(ttrwₜ)
 # 阶矩
@@ -64,7 +66,7 @@ simulate(fpttt)
 #= 4. 空间回火随机游走 =#
 strw = TelomereSTRW((l₀, α, β, γ, λ, μ, σ)) 
 # 相对应的路径
-strwₜ = strw(t)
+strwₜ = strw(T)
 # 模拟路径
 simulate(strwₜ)
 # 阶矩
@@ -74,20 +76,5 @@ fptst = FPT(domain, strw)
 # 模拟
 simulate(fptst)
 # 阶矩
-𝔼(fptst; N=100_000)
-# 𝔼(fptst^2)
-
-
-# t = collect(10:10:50)
-# L = TelomereRW((l₀, α, λ, μ, σ))
-
-# x = @. 𝔼(L(t))
-f(t) = t
-
-using Plots
-t = 1:1:10
-
-plot(t, f.(t), scale=:log)
-plot!(t, t .+ 1, scale=:log)
-
-jldsave("example.jld2"; l₀, α, β, γ, t, x)
+𝔼(fptst; N=1_000)
+𝔼(fptst^2)

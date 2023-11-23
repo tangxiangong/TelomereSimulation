@@ -70,7 +70,6 @@ function show(io::IO, l::TelomereSTRW)
     print(io, str)
 end
 
-
 struct TelomereLangevin <: StochasticProcess
     args::NTuple{5, Real}
     method
@@ -105,9 +104,14 @@ function moments(traj::Trajectory, N::Int; τ=0.01, order::Int=1)
     sum(moment)/N
 end
 
-# abstract type Functional end
+abstract type Functional end
 
-struct FPT
+struct FunctionalPower 
+    functional::Functional
+    order::Int
+end
+
+struct FPT <: Functional
     domain::NTuple{2, Real}
     sp::StochasticProcess
     function FPT(domain, sp)
@@ -118,39 +122,35 @@ end
 
 show(io::IO, f::FPT) = print(io, "$(f.sp) 关于区间 $(f.domain) 的首次通过时间")
 
-struct OccupationTime <: StochasticProcess
-    domain::NTuple{2, Real}
-    sp::StochasticProcess
-    method
-    args
-    function OccupationTime(sp)
-        @assert domain[1] < domain[2]
-        new(domain, sp, occupationtime, sp.args)
-    end
-end
-
-show(io::IO, ot::OccupationTime) = print(io, "$(ot.sp) 在区间 $(ot.domain) 内的占据时间")
-
-
-struct PowerFPT 
-    fpt::FPT
-    order::Int
-end 
-
-^(f::FPT, order::Int) = PowerFPT(f, order)
+^(functional::Functional, order::Int) = FunctionalPower(functional, order)
 
 simulate(f::FPT, τ=1e-2) = firstpassagetime(f.domain, f.sp.method, τ, f.sp.args...)
 
-function moments(f::FPT, N::Int; τ=1e-2, order::Int=1)
+function moments(functional::Functional, N::Int; τ=1e-2, order::Int=1)
     moment = zeros(nthreads())
     @threads for _ in 1:N
-        x = simulate(f, τ)
+        x = simulate(functional, τ)
         @inbounds moment[threadid()] += x^order
     end
     sum(moment)/N
 end
 
+struct OccupationTime <: Functional
+    T::Real
+    domain::NTuple{2, Real}
+    sp::StochasticProcess
+    function OccupationTime(T, domain, sp)
+        @assert domain[1] < domain[2] && T > 0
+        new(T, domain, sp)
+    end
+end
+
+show(io::IO, ot::OccupationTime) = print(io, "$(ot.sp) 在 [0, $(ot.T)] 内逗留在 $(ot.domain) 的时间")
+
+simulate(oc::OccupationTime, τ=1e-2) = occupationtime(oc.domain, oc.sp.method, oc.T, τ, oc.sp.args...)
+
+
 𝔼(traj::Trajectory; N::Int=100_000, τ=0.01) = moments(traj, N; τ=τ)
 𝔼(ptraj::PowerTrajectory; N::Int=100_000, τ=0.01) = moments(ptraj.traj, N; τ=τ, order=ptraj.order)
-𝔼(f::FPT; τ=1e-2, N::Int=100_000) = moments(f, N; τ=τ)
-𝔼(pf::PowerFPT; τ=1e-2, N::Int=100_000) = moments(pf.fpt, N; τ=τ, order=pf.order)
+𝔼(functional::Functional; τ=1e-2, N::Int=100_000) = moments(functional, N; τ=τ)
+𝔼(fp::FunctionalPower; τ=1e-2, N::Int=100_000) = moments(fp.functional, N; τ=τ, order=fp.order)
