@@ -1,3 +1,13 @@
+import FastGaussQuadrature: gausslegendre
+
+
+function get_weights_nodes(a, b, order)
+    nodes_unit, weights_unit = gausslegendre(order)
+    weights = @. (b-a) * weights_unit / 2
+    nodes = @. (b-a)*nodes_unit/2 + (b+a)/ 2
+    weights, nodes
+end
+
 function firstpassagetime(domain, method, args...)
     a, b = domain
     counter = 1
@@ -33,3 +43,4 @@ function occupationtime(domain, method, T, args...)
     end
     dural
 end
+

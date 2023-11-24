@@ -11,7 +11,8 @@ begin
     λ = 1
     μ = 0
     σ = 1
-    T = 100
+    T = 10
+    Δ = 1
     domain = (-10, 10)
 end
 #= 1. 随机游走 =#
@@ -34,7 +35,8 @@ simulate(fpt)
 
 #= 2. Lagevin 方程 =#
 
-langevin = TelomereLangevin((l₀, α, λ, μ, σ)) 
+langevin = TelomereLangevin((l₀, α, λ, μ, σ))
+𝔼(δ̄²(langevin, T, Δ))
 # 相对应的路径
 langevinₜ = langevin(T)
 # 模拟路径
