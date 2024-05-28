@@ -1,6 +1,6 @@
 include("./src/main.jl")
 using Plots
-pgfplotsx()
+
 
 #= 模型参数 =#
 begin
@@ -11,7 +11,7 @@ begin
     λ = 1
     μ = 0
     σ = 1
-    T = 10
+    T = 100
     Δ = 1
     domain = (-10, 10)
 end
@@ -21,7 +21,9 @@ rw = TelomereRW((l₀, α, λ, μ, σ))
 # 相对应的路径
 rwₜ = rw(T)
 # 模拟路径
-simulate(rwₜ, 0.1)
+t, x = simulate(rwₜ, 0.1)
+# Plots
+# plot(t, x)
 # 阶矩
 𝔼(rwₜ,τ=0.1), 𝔼(rwₜ^2)
 # 随机变量：首次通过时间
